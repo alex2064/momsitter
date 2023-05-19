@@ -1,6 +1,7 @@
 package com.momsitter.user.entity
 
 import com.momsitter.common.domain.BaseEntity
+import com.momsitter.common.status.Gender
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -10,84 +11,81 @@ import java.time.LocalDate
 )
 class User(
     @Column(nullable = false, length = 10)
-    var name: String,
+    val name: String,
 
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
-    var birthDate: LocalDate,
+    val birthDate: LocalDate,
 
     @Column(nullable = false, length = 5)
     @Enumerated(EnumType.STRING)
-    var gender: Gender,
+    val gender: Gender,
 
     @Column(nullable = false, length = 30)
-    var loginId: String,
+    val loginId: String,
 
     @Column(nullable = false, length = 100)
-    var password: String,
+    val password: String,
 
     @Column(nullable = false, length = 30)
-    var email: String,
-
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
-    var sitter: Sitter,
-
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
-    var parents: Parents,
+    val email: String,
 
     id: Long = 0L
-) : BaseEntity(id)
+) : BaseEntity(id) {
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
+    val sitter: Sitter? = null
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
+    val parents: Parents? = null
+}
 
 @Entity
 class Sitter(
-    @OneToOne(fetch = FetchType.LAZY)
-    var user: User,
+    @Column(nullable = false)
+    val frCareAge: Int,
 
     @Column(nullable = false)
-    var careFrAge: Int,
-
-    @Column(nullable = false)
-    var careToAge: Int,
+    val toCareAge: Int,
 
     @Column(nullable = false, length = 500)
     @Lob
-    var introduce: String,
+    val introduce: String,
+
+    @OneToOne(fetch = FetchType.LAZY)
+    val user: User,
 
     id: Long = 0L
 ) : BaseEntity(id)
 
 @Entity
 class Parents(
-    @OneToOne(fetch = FetchType.LAZY)
-    var user: User,
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parents")
-    var children: MutableList<Children>,
-
     @Column(nullable = false, length = 500)
     @Lob
-    var applyInfo: String,
+    val applyInfo: String,
+
+    @OneToOne(fetch = FetchType.LAZY)
+    val user: User,
 
     id: Long = 0L
-) : BaseEntity(id)
+) : BaseEntity(id) {
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parents")
+    val children: List<Children>? = null
+}
 
 @Entity
 class Children(
-    @ManyToOne(fetch = FetchType.LAZY)
-    var parents: Parents,
-
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
-    var birthDate: LocalDate,
+    val birthDate: LocalDate,
 
     @Column(nullable = false, length = 5)
     @Enumerated(EnumType.STRING)
-    var gender: Gender,
+    val gender: Gender,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    val parents: Parents,
 
     id: Long = 0L
 ) : BaseEntity(id)
-
-enum class Gender(val desc: String) {
-    MAN("남"),
-    WOMAN("여")
-}
