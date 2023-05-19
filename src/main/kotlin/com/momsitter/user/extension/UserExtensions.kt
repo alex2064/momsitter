@@ -8,23 +8,23 @@ import com.momsitter.user.entity.User
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-fun UserDtoRequest.toEntity(id: Long?): User =
+fun UserDtoRequest.toEntity(): User =
     User(name, birthDate, gender, loginId, password, email, id)
 
 fun User.toDto(): UserDtoResponse =
-    UserDtoResponse(name, birthDate.formatDate(), gender.desc, loginId, email, sitter?.toDto(), parents?.toDto())
+    UserDtoResponse(id!!, name, birthDate.formatDate(), gender.desc, loginId, email, sitter?.toDto(), parents?.toDto())
 
 fun SitterDtoRequest.toEntity(user: User): Sitter =
-    Sitter(frCareAge, toCareAge, introduce, user)
+    Sitter(frCareAge, toCareAge, introduce, user, id)
 
 fun Sitter.toDto(): SitterDtoResponse =
-    SitterDtoResponse("${frCareAge}세 ~ ${toCareAge}세", introduce)
+    SitterDtoResponse(id!!, "${frCareAge}세 ~ ${toCareAge}세", introduce)
 
 fun ParentsDtoRequest.toEntity(user: User): Parents =
-    Parents(applyInfo, user)
+    Parents(applyInfo, user, id)
 
 fun Parents.toDto(): ParentsDtoResponse =
-    ParentsDtoResponse(applyInfo, children!!.toDto())
+    ParentsDtoResponse(id!!, applyInfo, children!!.toDto())
 
 fun List<ChildrenDtoRequest>.toEntity(parents: Parents): List<Children> =
     this.map { it.toEntity(parents) }
@@ -33,10 +33,10 @@ fun List<Children>.toDto(): List<ChildrenDtoResponse> =
     this.map { it.toDto() }
 
 fun ChildrenDtoRequest.toEntity(parents: Parents): Children =
-    Children(birthDate, gender, parents)
+    Children(birthDate, gender, parents, id)
 
 fun Children.toDto(): ChildrenDtoResponse =
-    ChildrenDtoResponse(birthDate.formatDate(), gender.desc)
+    ChildrenDtoResponse(id!!, birthDate.formatDate(), gender.desc)
 
 fun LocalDate.formatDate(): String =
     this.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
