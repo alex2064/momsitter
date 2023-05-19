@@ -16,7 +16,7 @@ class CustomExceptionHandler {
         ex.bindingResult.allErrors.forEach { error ->
             val fieldName = (error as FieldError).field
             val errorMessage = error.getDefaultMessage()
-            errors[fieldName] = errorMessage ?: "NULL"
+            errors[fieldName] = errorMessage ?: "Not Exception Message"
         }
         return ResponseEntity(errors, HttpStatus.BAD_REQUEST)
     }

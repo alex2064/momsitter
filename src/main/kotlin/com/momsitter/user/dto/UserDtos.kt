@@ -12,6 +12,7 @@ data class UserDtoRequest(
     val email: String,
     val sitter: SitterDtoRequest?,
     val parents: ParentsDtoRequest?,
+    val id: Long?
 )
 
 data class UserDtoResponse(

@@ -30,7 +30,7 @@ class User(
     @Column(nullable = false, length = 30)
     val email: String,
 
-    id: Long = 0L
+    id: Long? = null
 ) : BaseEntity(id) {
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
@@ -55,7 +55,7 @@ class Sitter(
     @OneToOne(fetch = FetchType.LAZY)
     val user: User,
 
-    id: Long = 0L
+    id: Long? = null
 ) : BaseEntity(id)
 
 @Entity
@@ -67,7 +67,7 @@ class Parents(
     @OneToOne(fetch = FetchType.LAZY)
     val user: User,
 
-    id: Long = 0L
+    id: Long? = null
 ) : BaseEntity(id) {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "parents")
@@ -87,5 +87,5 @@ class Children(
     @ManyToOne(fetch = FetchType.LAZY)
     val parents: Parents,
 
-    id: Long = 0L
+    id: Long? = null
 ) : BaseEntity(id)

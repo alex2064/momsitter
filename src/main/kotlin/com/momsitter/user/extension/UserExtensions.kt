@@ -8,7 +8,7 @@ import com.momsitter.user.entity.User
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-fun UserDtoRequest.toEntity(id: Long): User =
+fun UserDtoRequest.toEntity(id: Long?): User =
     User(name, birthDate, gender, loginId, password, email, id)
 
 fun User.toDto(): UserDtoResponse =
