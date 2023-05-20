@@ -4,8 +4,6 @@ import com.momsitter.common.auth.TokenInfo
 import com.momsitter.common.dto.BaseResponse
 import com.momsitter.user.dto.*
 import com.momsitter.user.service.UserService
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.User
 import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/api/user")

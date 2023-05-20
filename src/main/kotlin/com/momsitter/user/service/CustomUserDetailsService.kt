@@ -1,7 +1,9 @@
 package com.momsitter.user.service
 
+import com.momsitter.common.dto.CustomUser
 import com.momsitter.user.entity.User
 import com.momsitter.user.repository.UserRepository
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -18,10 +20,10 @@ class CustomUserDetailsService(
             ?.let { createUserDetails(it) } ?: throw UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다.")
 
     private fun createUserDetails(user: User): UserDetails =
-        org.springframework.security.core.userdetails.User.builder()
-            .username(user.loginId)
-            .password(passwordEncoder.encode(user.password))
-            .roles(*user.userRole!!.map { it.role.name }.toTypedArray())
-            .build()
-
+        CustomUser(
+            user.id!!,
+            user.loginId,
+            passwordEncoder.encode(user.password),
+            user.userRole!!.map { SimpleGrantedAuthority("ROLE_" + it.role) }
+        )
 }

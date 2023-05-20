@@ -4,8 +4,6 @@ import com.momsitter.common.domain.BaseEntity
 import com.momsitter.common.status.Gender
 import com.momsitter.common.status.ROLE
 import jakarta.persistence.*
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDate
 
 @Entity
@@ -28,13 +26,13 @@ class User(
     val loginId: String,
 
     @Column(nullable = false, length = 100)
-    private val password: String,
+    val password: String,
 
     @Column(nullable = false, length = 30)
     val email: String,
 
     id: Long?
-) : BaseEntity(id), UserDetails {
+) : BaseEntity(id) {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     val userRole: List<UserRole>? = null
@@ -45,34 +43,6 @@ class User(
 
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "user")
     val parents: Parents? = null
-
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority>? {
-        return null
-    }
-
-    override fun getPassword(): String {
-        return password
-    }
-
-    override fun getUsername(): String {
-        return loginId
-    }
-
-    override fun isAccountNonExpired(): Boolean {
-        return true
-    }
-
-    override fun isAccountNonLocked(): Boolean {
-        return true
-    }
-
-    override fun isCredentialsNonExpired(): Boolean {
-        return true
-    }
-
-    override fun isEnabled(): Boolean {
-        return true
-    }
 }
 
 @Entity

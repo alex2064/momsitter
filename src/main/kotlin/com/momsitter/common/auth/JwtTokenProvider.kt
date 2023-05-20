@@ -1,11 +1,6 @@
 package com.momsitter.common.auth
 
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.ExpiredJwtException
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.MalformedJwtException
-import io.jsonwebtoken.SignatureAlgorithm
-import io.jsonwebtoken.UnsupportedJwtException
+import io.jsonwebtoken.*
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.security.SecurityException
@@ -17,10 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
-import java.lang.IllegalArgumentException
 import java.util.*
-import java.util.Base64.Decoder
-import javax.crypto.SecretKey
 
 const val EXPIRATION_MILLISECONDS: Long = 1000 * 60 * 60 * 12
 
