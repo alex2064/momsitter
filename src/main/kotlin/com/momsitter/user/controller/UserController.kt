@@ -5,6 +5,7 @@ import com.momsitter.common.dto.BaseResponse
 import com.momsitter.common.dto.CustomUser
 import com.momsitter.user.dto.*
 import com.momsitter.user.service.UserService
+import jakarta.validation.Valid
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
@@ -18,7 +19,7 @@ class UserController(
      * 회원가입
      */
     @PostMapping("/signup")
-    fun signUp(@RequestBody userDtoRequest: UserDtoRequest): BaseResponse<Unit> {
+    fun signUp(@RequestBody @Valid userDtoRequest: UserDtoRequest): BaseResponse<Unit> {
         userService.signUp(userDtoRequest)
         return BaseResponse()
     }
@@ -45,7 +46,7 @@ class UserController(
      * 내 정보 저장
      */
     @PostMapping("/info")
-    fun saveMyInfo(@RequestBody userDtoRequest: UserDtoRequest): BaseResponse<Unit> {
+    fun saveMyInfo(@RequestBody @Valid userDtoRequest: UserDtoRequest): BaseResponse<Unit> {
         userService.saveMyInfo(userDtoRequest)
         return BaseResponse()
     }

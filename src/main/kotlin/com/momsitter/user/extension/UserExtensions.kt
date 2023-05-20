@@ -39,6 +39,9 @@ fun ChildrenDtoRequest.toEntity(parents: Parents): Children =
 fun Children.toDto(): ChildrenDtoResponse =
     ChildrenDtoResponse(id!!, birthDate.formatDate(), gender.desc, calculateAge(birthDate.formatDate()))
 
+fun String.toLocalDate(): LocalDate =
+    LocalDate.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
 fun LocalDate.formatDate(): String =
     this.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 
