@@ -33,10 +33,11 @@ class User(
     id: Long?
 ) : BaseEntity(id) {
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
+    // @OneToOne 인 경우 주인이 아니면 FetchType.LAZY 를 줘도 지연로딩 안됨
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "user")
     val sitter: Sitter? = null
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "user")
     val parents: Parents? = null
 }
 

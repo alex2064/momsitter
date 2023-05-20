@@ -28,4 +28,10 @@ class CustomExceptionHandler {
         val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception Message"))
         return ResponseEntity(BaseResponse(ResultCode.ERROR.name, errors, ResultCode.ERROR.msg), HttpStatus.BAD_REQUEST)
     }
+
+    @ExceptionHandler(Exception::class)
+    protected fun defaultException(ex: Exception): ResponseEntity<BaseResponse<Map<String, String>>> {
+        val errors = mapOf("미처리 에러" to (ex.message ?: "Not Exception Message"))
+        return ResponseEntity(BaseResponse(ResultCode.ERROR.name, errors, ResultCode.ERROR.msg), HttpStatus.BAD_REQUEST)
+    }
 }

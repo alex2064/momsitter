@@ -1,11 +1,12 @@
 package com.momsitter.user.service
 
-import com.momsitter.common.dto.BaseResponse
 import com.momsitter.common.exception.InvalidInputException
 import com.momsitter.user.dto.ParentsDtoRequest
 import com.momsitter.user.dto.SitterDtoRequest
 import com.momsitter.user.dto.UserDtoRequest
 import com.momsitter.user.dto.UserDtoResponse
+import com.momsitter.user.entity.Children
+import com.momsitter.user.entity.Parents
 import com.momsitter.user.entity.User
 import com.momsitter.user.extension.toDto
 import com.momsitter.user.extension.toEntity
@@ -38,47 +39,39 @@ class UserService(
     }
 
     /**
-     * 내 정보 보기
-     */
-    fun searchMyInfo(id: Long): UserDtoResponse {
-        val user = userRepository.findByIdOrNull(id) ?: throw InvalidInputException("id", "회원번호(${id})가 존재하지 않는 유저입니다.")
-        return user.toDto()
-    }
-
-    /**
-     * 내 정보 업데이트
+     * 내 정보 저장
      */
     fun saveMyInfo(userDtoRequest: UserDtoRequest): Boolean {
-        val user = userDtoRequest.toEntity()
+        val user: User = userDtoRequest.toEntity()
         userRepository.save(user)
 
-        val sitter = userDtoRequest.sitter?.let {
-            val sitterEntity = it.toEntity(user)
-            sitterRepository.save(sitterEntity)
-            sitterEntity
+        userDtoRequest.sitter?.let {
+            saveSitter(user.id!!, it)
         }
 
-        val parents = userDtoRequest.parents?.let { p ->
-            val parentsEntity = p.toEntity(user)
-            parentsRepository.save(parentsEntity)
-
-            val childrenEntityList = p.children.toEntity(parentsEntity)
-            childrenRepository.saveAll(childrenEntityList)
-            parentsEntity
+        userDtoRequest.parents?.let {
+            saveParents(user.id!!, it)
         }
 
         return true
     }
 
+    fun searchUser(id: Long): User =
+        userRepository.findByIdOrNull(id) ?: throw InvalidInputException("id", "회원번호(${id})가 존재하지 않는 유저입니다.")
+
+    /**
+     * 내 정보 보기
+     */
+    fun searchMyInfo(id: Long): UserDtoResponse {
+        val user: User = searchUser(id)
+        return user.toDto()
+    }
+
     /**
      * 시터 정보 저장
      */
-    fun saveSitter(sitterDtoRequest: SitterDtoRequest): Boolean {
-        val user = sitterRepository.findByIdOrNull(sitterDtoRequest.id)?.user ?: throw InvalidInputException(
-            "sitter",
-            "시터 정보가 확인되지 않습니다."
-        )
-
+    fun saveSitter(userId: Long, sitterDtoRequest: SitterDtoRequest): Boolean {
+        val user: User = searchUser(userId)
         val sitter = sitterDtoRequest.toEntity(user)
         sitterRepository.save(sitter)
         return true
@@ -95,16 +88,19 @@ class UserService(
     /**
      * 부모 정보 저장
      */
-    fun saveParents(parentsDtoRequest: ParentsDtoRequest): Boolean {
-        val user = parentsRepository.findByIdOrNull(parentsDtoRequest.id)?.user ?: throw InvalidInputException(
-            "sitter",
-            "부모 정보가 확인되지 않습니다."
-        )
+    fun saveParents(userId: Long, parentsDtoRequest: ParentsDtoRequest): Boolean {
+        val user: User = searchUser(userId)
 
-        val parents = parentsDtoRequest.toEntity(user)
+        // 수정인 경우 같이 들어오지 않은 children 은 삭제
+        parentsDtoRequest.id?.let {
+            val childrenIds: List<Long> = parentsDtoRequest.children.map { c -> c.id ?: 0 }
+            childrenRepository.deleteByParentsIdAndIdNotIn(it, childrenIds)
+        }
+
+        val parents: Parents = parentsDtoRequest.toEntity(user)
         parentsRepository.save(parents)
 
-        val children = parentsDtoRequest.children.toEntity(parents)
+        val children: List<Children> = parentsDtoRequest.children.toEntity(parents)
         childrenRepository.saveAll(children)
 
         return true
@@ -114,8 +110,11 @@ class UserService(
      * 부모 정보 삭제
      */
     fun removeParents(id: Long): Boolean {
-        childrenRepository.findByParentsId(id)?.let { e -> e.map { childrenRepository.deleteById(it.id!!) } }
+        childrenRepository.findByParentsId(id).let {
+            it.forEach { c -> childrenRepository.deleteById(c.id!!) }
+        }
         parentsRepository.deleteById(id)
+
         return true
     }
 

@@ -14,4 +14,5 @@ interface SitterRepository : JpaRepository<Sitter, Long>
 interface ParentsRepository : JpaRepository<Parents, Long>
 interface ChildrenRepository : JpaRepository<Children, Long> {
     fun findByParentsId(parentsId: Long): List<Children>
+    fun deleteByParentsIdAndIdNotIn(parentsId: Long, ids: List<Long>)
 }
