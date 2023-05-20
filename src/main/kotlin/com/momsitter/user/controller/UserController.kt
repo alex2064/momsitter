@@ -2,8 +2,10 @@ package com.momsitter.user.controller
 
 import com.momsitter.common.auth.TokenInfo
 import com.momsitter.common.dto.BaseResponse
+import com.momsitter.common.dto.CustomUser
 import com.momsitter.user.dto.*
 import com.momsitter.user.service.UserService
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/api/user")
@@ -32,9 +34,10 @@ class UserController(
     /**
      * 내 정보 보기
      */
-    @GetMapping("/info/{id}")
-    fun searchMyInfo(@PathVariable id: Long): BaseResponse<UserDtoResponse> {
-        val response = userService.searchMyInfo(id)
+    @GetMapping("/info")
+    fun searchMyInfo(): BaseResponse<UserDtoResponse> {
+        val userId = (SecurityContextHolder.getContext().authentication.principal as CustomUser).userId
+        val response = userService.searchMyInfo(userId)
         return BaseResponse(data = response)
     }
 
@@ -50,11 +53,9 @@ class UserController(
     /**
      * 시터 정보 저장
      */
-    @PostMapping("/sitter/{userId}")
-    fun saveSitter(
-        @PathVariable userId: Long,
-        @RequestBody sitterDtoRequest: SitterDtoRequest,
-    ): BaseResponse<Unit> {
+    @PostMapping("/sitter")
+    fun saveSitter(@RequestBody sitterDtoRequest: SitterDtoRequest): BaseResponse<Unit> {
+        val userId = (SecurityContextHolder.getContext().authentication.principal as CustomUser).userId
         userService.saveSitter(userId, sitterDtoRequest)
         return BaseResponse()
     }
@@ -71,11 +72,9 @@ class UserController(
     /**
      * 부모 정보 저장
      */
-    @PostMapping("/parents/{userId}")
-    fun saveParents(
-        @PathVariable userId: Long,
-        @RequestBody parentsDtoRequest: ParentsDtoRequest,
-    ): BaseResponse<Unit> {
+    @PostMapping("/parents")
+    fun saveParents(@RequestBody parentsDtoRequest: ParentsDtoRequest): BaseResponse<Unit> {
+        val userId = (SecurityContextHolder.getContext().authentication.principal as CustomUser).userId
         userService.saveParents(userId, parentsDtoRequest)
         return BaseResponse()
     }
