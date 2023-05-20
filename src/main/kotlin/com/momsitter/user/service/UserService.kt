@@ -1,41 +1,63 @@
 package com.momsitter.user.service
 
+import com.momsitter.common.auth.JwtTokenProvider
+import com.momsitter.common.auth.TokenInfo
 import com.momsitter.common.exception.InvalidInputException
-import com.momsitter.user.dto.ParentsDtoRequest
-import com.momsitter.user.dto.SitterDtoRequest
-import com.momsitter.user.dto.UserDtoRequest
-import com.momsitter.user.dto.UserDtoResponse
+import com.momsitter.common.status.ROLE
+import com.momsitter.user.dto.*
 import com.momsitter.user.entity.Children
 import com.momsitter.user.entity.Parents
 import com.momsitter.user.entity.User
+import com.momsitter.user.entity.UserRole
 import com.momsitter.user.extension.toDto
 import com.momsitter.user.extension.toEntity
-import com.momsitter.user.repository.ChildrenRepository
-import com.momsitter.user.repository.ParentsRepository
-import com.momsitter.user.repository.SitterRepository
-import com.momsitter.user.repository.UserRepository
+import com.momsitter.user.repository.*
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.stereotype.Service
 
 @Transactional
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val userRoleRepository: UserRoleRepository,
     private val sitterRepository: SitterRepository,
     private val parentsRepository: ParentsRepository,
-    private val childrenRepository: ChildrenRepository
+    private val childrenRepository: ChildrenRepository,
+    private val authenticationManagerBuilder: AuthenticationManagerBuilder,
+    private val jwtTokenProvider: JwtTokenProvider,
 ) {
+    /**
+     * Token
+     */
+    fun login(loginDto: LoginDto): TokenInfo {
+        val authenticationToken = UsernamePasswordAuthenticationToken(loginDto.loginId, loginDto.password)
+        val authentication = authenticationManagerBuilder.`object`.authenticate(authenticationToken)
+
+        return jwtTokenProvider.createToken(authentication)
+    }
+
     /**
      * 회원 가입
      */
     fun signUp(userDtoRequest: UserDtoRequest): Boolean {
-        val userList: List<User?> = userRepository.findByLoginId(userDtoRequest.loginId)
-        if (userList.isNotEmpty()) {
+        var user: User? = userRepository.findByLoginId(userDtoRequest.loginId)
+        if (user != null) {
             throw InvalidInputException("loginId", "이미 등록된 ID 입니다.")
         }
 
-        return saveMyInfo(userDtoRequest)
+        // 사용자 정보 저장
+        saveMyInfo(userDtoRequest)
+
+        user = userRepository.findByLoginId(userDtoRequest.loginId)
+
+        // 권한 저장
+        val userRole = UserRole(ROLE.USER, user!!, null)
+        userRoleRepository.save(userRole)
+
+        return true
     }
 
     /**

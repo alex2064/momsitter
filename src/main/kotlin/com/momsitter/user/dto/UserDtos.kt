@@ -3,6 +3,11 @@ package com.momsitter.user.dto
 import com.momsitter.common.status.Gender
 import java.time.LocalDate
 
+data class LoginDto(
+    val loginId: String,
+    val password: String
+)
+
 data class UserDtoRequest(
     val id: Long?,
     val name: String,

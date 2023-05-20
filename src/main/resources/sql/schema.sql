@@ -10,6 +10,15 @@ CREATE TABLE `user` (
   UNIQUE KEY `uk_user_login_id` (`login_id`)
 );
 
+CREATE TABLE `user_role` (
+  `id` bigint(20) NOT NULL COMMENT 'key',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '회원번호(user.key)',
+  `role` varchar(30) NOT NULL COMMENT '권한',
+  PRIMARY KEY (`id`),
+  KEY `fk_user_role_user_id` (`user_id`),
+  CONSTRAINT `fk_user_role_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+);
+
 CREATE TABLE `sitter` (
   `id` bigint(20) NOT NULL COMMENT 'key',
   `user_id` bigint(20) DEFAULT NULL COMMENT '회원번호(user.key)',

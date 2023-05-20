@@ -2,7 +2,10 @@ package com.momsitter.user.entity
 
 import com.momsitter.common.domain.BaseEntity
 import com.momsitter.common.status.Gender
+import com.momsitter.common.status.ROLE
 import jakarta.persistence.*
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDate
 
 @Entity
@@ -25,13 +28,16 @@ class User(
     val loginId: String,
 
     @Column(nullable = false, length = 100)
-    val password: String,
+    private val password: String,
 
     @Column(nullable = false, length = 30)
     val email: String,
 
     id: Long?
-) : BaseEntity(id) {
+) : BaseEntity(id), UserDetails {
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    val userRole: List<UserRole>? = null
 
     // @OneToOne 인 경우 주인이 아니면 FetchType.LAZY 를 줘도 지연로딩 안됨
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "user")
@@ -39,7 +45,48 @@ class User(
 
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "user")
     val parents: Parents? = null
+
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority>? {
+        return null
+    }
+
+    override fun getPassword(): String {
+        return password
+    }
+
+    override fun getUsername(): String {
+        return loginId
+    }
+
+    override fun isAccountNonExpired(): Boolean {
+        return true
+    }
+
+    override fun isAccountNonLocked(): Boolean {
+        return true
+    }
+
+    override fun isCredentialsNonExpired(): Boolean {
+        return true
+    }
+
+    override fun isEnabled(): Boolean {
+        return true
+    }
 }
+
+@Entity
+class UserRole(
+    @Column(nullable = false, length = 30)
+    @Enumerated(EnumType.STRING)
+    val role: ROLE,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(foreignKey = ForeignKey(name = "fk_user_role_user_id"))
+    val user: User,
+
+    id: Long?
+) : BaseEntity(id)
 
 @Entity
 class Sitter(

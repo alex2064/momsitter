@@ -1,11 +1,11 @@
 package com.momsitter.user.controller
 
+import com.momsitter.common.auth.TokenInfo
 import com.momsitter.common.dto.BaseResponse
-import com.momsitter.user.dto.ParentsDtoRequest
-import com.momsitter.user.dto.SitterDtoRequest
-import com.momsitter.user.dto.UserDtoRequest
-import com.momsitter.user.dto.UserDtoResponse
+import com.momsitter.user.dto.*
 import com.momsitter.user.service.UserService
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.User
 import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/api/user")
@@ -21,6 +21,14 @@ class UserController(
     fun signUp(@RequestBody userDtoRequest: UserDtoRequest): BaseResponse<Unit> {
         userService.signUp(userDtoRequest)
         return BaseResponse()
+    }
+
+    /**
+     * 로그인
+     */
+    @PostMapping("/login")
+    fun login(@RequestBody loginDto: LoginDto): TokenInfo {
+        return userService.login(loginDto)
     }
 
     /**
