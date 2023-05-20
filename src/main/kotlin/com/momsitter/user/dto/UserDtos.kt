@@ -42,6 +42,7 @@ data class SitterDtoResponse(
     val id: Long,
     val careAge: String,
     val introduce: String,
+    val frCareAge: Int,
 )
 
 data class ParentsDtoRequest(
@@ -66,4 +67,5 @@ data class ChildrenDtoResponse(
     val id: Long,
     val birthDate: String,
     val gender: String,
+    val age: Int,
 )

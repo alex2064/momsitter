@@ -6,6 +6,7 @@ import com.momsitter.user.entity.Parents
 import com.momsitter.user.entity.Sitter
 import com.momsitter.user.entity.User
 import java.time.LocalDate
+import java.time.Period
 import java.time.format.DateTimeFormatter
 
 fun UserDtoRequest.toEntity(): User =
@@ -18,7 +19,7 @@ fun SitterDtoRequest.toEntity(user: User): Sitter =
     Sitter(frCareAge, toCareAge, introduce, user, id)
 
 fun Sitter.toDto(): SitterDtoResponse =
-    SitterDtoResponse(id!!, "${frCareAge}세 ~ ${toCareAge}세", introduce)
+    SitterDtoResponse(id!!, "${frCareAge}세 ~ ${toCareAge}세", introduce, frCareAge)
 
 fun ParentsDtoRequest.toEntity(user: User): Parents =
     Parents(applyInfo, user, id)
@@ -36,7 +37,13 @@ fun ChildrenDtoRequest.toEntity(parents: Parents): Children =
     Children(birthDate, gender, parents, id)
 
 fun Children.toDto(): ChildrenDtoResponse =
-    ChildrenDtoResponse(id!!, birthDate.formatDate(), gender.desc)
+    ChildrenDtoResponse(id!!, birthDate.formatDate(), gender.desc, calculateAge(birthDate.formatDate()))
 
 fun LocalDate.formatDate(): String =
     this.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+
+fun calculateAge(dateOfBirth: String): Int {
+    val currentDate = LocalDate.now()
+    val parsedDateOfBirth = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("yyyyMMdd"))
+    return Period.between(parsedDateOfBirth, currentDate).years
+}
