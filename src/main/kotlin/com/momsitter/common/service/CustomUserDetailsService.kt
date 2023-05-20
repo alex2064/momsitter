@@ -1,4 +1,4 @@
-package com.momsitter.user.service
+package com.momsitter.common.service
 
 import com.momsitter.common.dto.CustomUser
 import com.momsitter.user.entity.User
