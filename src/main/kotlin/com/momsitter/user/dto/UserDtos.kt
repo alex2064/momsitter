@@ -10,9 +10,19 @@ import jakarta.validation.constraints.Pattern
 import java.time.LocalDate
 
 data class LoginDto(
-    val loginId: String,
+    @field:NotBlank
+    @JsonProperty("loginId")
+    private val _loginId: String?,
+
+    @field:NotBlank
+    @JsonProperty("password")
+    private val _password: String?,
+) {
+    val loginId: String
+        get() = _loginId!!
     val password: String
-)
+        get() = _password!!
+}
 
 data class UserDtoRequest(
     val id: Long?,
@@ -80,10 +90,10 @@ data class UserDtoResponse(
 )
 
 data class SitterDtoRequest(
-    val id: Long?,
-    val frCareAge: Int,
-    val toCareAge: Int,
-    val introduce: String,
+    var id: Long?,
+    val frCareAge: Int = 0,
+    val toCareAge: Int = 0,
+    val introduce: String = "",
 )
 
 data class SitterDtoResponse(
@@ -94,8 +104,8 @@ data class SitterDtoResponse(
 )
 
 data class ParentsDtoRequest(
-    val id: Long?,
-    val applyInfo: String,
+    var id: Long?,
+    val applyInfo: String = "",
     val children: List<ChildrenDtoRequest>,
 )
 
@@ -107,8 +117,8 @@ data class ParentsDtoResponse(
 
 data class ChildrenDtoRequest(
     val id: Long?,
-    val birthDate: LocalDate,
-    val gender: Gender,
+    val birthDate: LocalDate = LocalDate.now(),
+    val gender: Gender = Gender.MAN,
 )
 
 data class ChildrenDtoResponse(

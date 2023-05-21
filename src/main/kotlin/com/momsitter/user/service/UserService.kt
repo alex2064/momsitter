@@ -94,6 +94,11 @@ class UserService(
      */
     fun saveSitter(userId: Long, sitterDtoRequest: SitterDtoRequest): Boolean {
         val user: User = searchUser(userId)
+
+        if (sitterDtoRequest.id == null) {
+            sitterDtoRequest.id = user.sitter?.id
+        }
+
         val sitter = sitterDtoRequest.toEntity(user)
         sitterRepository.save(sitter)
         return true
@@ -102,8 +107,10 @@ class UserService(
     /**
      * 시터 정보 삭제
      */
-    fun removeSitter(id: Long): Boolean {
-        sitterRepository.deleteById(id)
+    fun removeSitter(userId: Long): Boolean {
+        val user: User = searchUser(userId)
+        user.sitter?.id?.let { sitterRepository.deleteById(it) }
+
         return true
     }
 
@@ -112,6 +119,10 @@ class UserService(
      */
     fun saveParents(userId: Long, parentsDtoRequest: ParentsDtoRequest): Boolean {
         val user: User = searchUser(userId)
+
+        if (parentsDtoRequest.id == null) {
+            parentsDtoRequest.id = user.parents?.id
+        }
 
         // 수정인 경우 같이 들어오지 않은 children 은 삭제
         parentsDtoRequest.id?.let {
@@ -131,12 +142,14 @@ class UserService(
     /**
      * 부모 정보 삭제
      */
-    fun removeParents(id: Long): Boolean {
-        childrenRepository.findByParentsId(id).let {
-            it.forEach { c -> childrenRepository.deleteById(c.id!!) }
+    fun removeParents(userId: Long): Boolean {
+        val user: User = searchUser(userId)
+        user.parents?.id?.let { id ->
+            childrenRepository.findByParentsId(id).let { list ->
+                list.forEach { c -> childrenRepository.deleteById(c.id!!) }
+            }
+            parentsRepository.deleteById(id)
         }
-        parentsRepository.deleteById(id)
-
         return true
     }
 

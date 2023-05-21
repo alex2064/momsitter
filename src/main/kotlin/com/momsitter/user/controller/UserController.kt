@@ -28,7 +28,7 @@ class UserController(
      * 로그인
      */
     @PostMapping("/login")
-    fun login(@RequestBody loginDto: LoginDto): TokenInfo {
+    fun login(@RequestBody @Valid loginDto: LoginDto): TokenInfo {
         return userService.login(loginDto)
     }
 
@@ -64,9 +64,10 @@ class UserController(
     /**
      * 시터 정보 삭제
      */
-    @DeleteMapping("/sitter/{id}")
-    fun removeSitter(@PathVariable id: Long): BaseResponse<Unit> {
-        userService.removeSitter(id)
+    @DeleteMapping("/sitter")
+    fun removeSitter(): BaseResponse<Unit> {
+        val userId = (SecurityContextHolder.getContext().authentication.principal as CustomUser).userId
+        userService.removeSitter(userId)
         return BaseResponse()
     }
 
@@ -83,9 +84,10 @@ class UserController(
     /**
      * 부모 정보 삭제
      */
-    @DeleteMapping("/parents/{id}")
-    fun removeParents(@PathVariable id: Long): BaseResponse<Unit> {
-        userService.removeParents(id)
+    @DeleteMapping("/parents")
+    fun removeParents(): BaseResponse<Unit> {
+        val userId = (SecurityContextHolder.getContext().authentication.principal as CustomUser).userId
+        userService.removeParents(userId)
         return BaseResponse()
     }
 }
