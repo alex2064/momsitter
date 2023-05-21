@@ -23,7 +23,7 @@ class SecurityConfig(
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeHttpRequests()
-            .requestMatchers("/api/user/signup", "/api/user/login").permitAll() // 순차적으로 먹음
+            .requestMatchers("/api/user/signup", "/api/user/login").anonymous() // 순차적으로 먹음
             .requestMatchers("/api/user/**").hasRole("USER")
             .anyRequest().permitAll()
             .and()
